@@ -101,11 +101,11 @@ class Pipeline:
                 started = time.time()
                 ok, frame = capture.read()
                 if not ok and is_file and not self._stop.is_set():
-                    # end of the clip: start it again, with fresh IDs
+                    # end of the clip: start it again; the same people keep their numbers
                     if source == "recorded":
                         capture.set(cv2.CAP_PROP_POS_FRAMES, 0)
                         self._detector.reset()
-                        self._rules.reset()
+                        self._rules.tracker_reset()  # same people, so keep their numbers
                         ok, frame = capture.read()
                 if not ok:
                     self.status = "unavailable"

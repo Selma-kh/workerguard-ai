@@ -59,7 +59,7 @@ Open <http://localhost:3000> and click **Start**. The first click also lets the 
 
 ### The Recorded source
 
-Put any video (`.mp4`, `.mov`, `.webm`...) in `backend/media/`, then press **Recorded** on the dashboard. The first video in the folder is used and it loops. When a clip loops, its people "re-enter", so incident counts rise each time around. Use a freely licensed stock clip or one you film yourself, and keep its license information. Clips are git-ignored by default.
+Put any video (`.mp4`, `.mov`, `.webm`...) in `backend/media/`, then press **Recorded** on the dashboard. The first video in the folder is used and it loops. When a clip loops, the same workers keep their numbers, so a missing vest is not counted again, but a worker who walks into the danger zone on every pass is counted again. Use a freely licensed stock clip or one you film yourself, and keep its license information. Clips are git-ignored by default.
 
 ### Move the danger zone
 

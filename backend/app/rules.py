@@ -103,6 +103,13 @@ class RulesEngine:
         self._number_of.clear()
         self._last_box.clear()
 
+    def tracker_reset(self) -> None:
+        """The tracker started over (a recorded clip looped), so its IDs mean something new.
+        Keep who we knew (numbers, history, last positions) so the same people can be
+        recognised again instead of becoming new workers."""
+        self._frames_seen.clear()
+        self._number_of.clear()
+
     def new_session(self) -> None:
         self.reset()
         self._next_number = 1
