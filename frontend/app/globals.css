@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* Look and feel: steel/charcoal greys, deep blue accent, yellow/orange for missing PPE, red for danger. */
+:root {
+  --background: #eef0f3;
+  --foreground: #1f2933;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-brand: #1e3a8a;
+  --color-brand-dark: #172b66;
+  --color-steel: #5b6673;
+  --color-steel-light: #d5d9df;
+  --color-charcoal: #1f2933;
+  --color-warn: #f59e0b;
+  --color-danger: #dc2626;
+  --color-ok: #16a34a;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}

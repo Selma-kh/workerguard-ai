@@ -1,0 +1,12 @@
+/devpost/learner-profile.md
+.env
+.env.*
+!.env.example
+
+# Backend: environment, caches, downloaded weights, generated snapshots
+backend/.venv/
+__pycache__/
+*.pyc
+backend/models/*.pt
+backend/data/snapshots/
+.DS_Store
