@@ -43,6 +43,12 @@ DANGER_ZONE = (0.55, 0.40, 1.0, 1.0)  # reaches the frame edges so nobody "slips
 # standing on the edge does not create a stream of enter/leave events.
 ZONE_ENTER_FRAMES = 3
 ZONE_EXIT_FRAMES = 12
+# A person only counts after being tracked for this many frames (ignores ghost detections).
+CONFIRM_FRAMES = 5
+# A newly confirmed person who appears near someone lost less than this long ago (and within
+# ADOPT_DISTANCE box sizes of where they were) is treated as the same person.
+ADOPT_SECONDS = 2.0
+ADOPT_DISTANCE = 1.0
 # People not seen for this long are forgotten (a later return counts as new).
 FORGET_AFTER_SECONDS = 8
 

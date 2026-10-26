@@ -1,7 +1,14 @@
 """The safety rules: who wears what, who is in the danger zone, and which incidents are new.
 
-Each person (by ID) keeps a short history, so one missed detection does not make their
+Each person keeps a short history, so one missed detection does not make their
 status flicker, and a person who is briefly lost and found again is not counted twice.
+
+The tracker sometimes gives the same person a new ID (for example when the box suddenly
+changes size). Three safeguards sit on top of it:
+- a person only counts after CONFIRM_FRAMES frames, so brief ghost detections are ignored;
+- a newly confirmed person who appears close to someone lost a moment ago takes over that
+  person's number, with their history, instead of becoming a "new worker";
+- the numbers shown ("Worker 1", "Worker 2"...) are our own and start at 1.
 
 Counting rules (see prd.md > Counting rules):
 - a zone violation is created when a person ENTERS the zone (outside -> inside);
@@ -74,10 +81,42 @@ def zone_pixels(frame_shape) -> tuple[int, int, int, int]:
 
 class RulesEngine:
     def __init__(self) -> None:
-        self._histories: dict[int, _History] = {}
+        self._histories: dict[int, _History] = {}  # keyed by our own worker number
+        self._frames_seen: dict[int, int] = {}  # tracker ID -> frames seen
+        self._number_of: dict[int, int] = {}  # tracker ID -> worker number
+        self._last_box: dict[int, tuple] = {}  # worker number -> last box
+        self._next_number = 1
 
     def reset(self) -> None:
+        """Forget current people (e.g. when the source changes). Numbers keep counting."""
         self._histories.clear()
+        self._frames_seen.clear()
+        self._number_of.clear()
+        self._last_box.clear()
+
+    def new_session(self) -> None:
+        self.reset()
+        self._next_number = 1
+
+    def _assign_number(self, person: Person, present_numbers: set[int], now: float) -> int:
+        """Give a newly confirmed person a number: take over a nearby lost person's, or a new one."""
+        px1, py1, px2, py2 = person.box
+        pcx, pcy = (px1 + px2) / 2, (py1 + py2) / 2
+        size = max(px2 - px1, py2 - py1)
+        best, best_distance = None, None
+        for number, history in self._histories.items():
+            if number in present_numbers or now - history.last_seen > config.ADOPT_SECONDS:
+                continue
+            bx1, by1, bx2, by2 = self._last_box[number]
+            distance = ((pcx - (bx1 + bx2) / 2) ** 2 + (pcy - (by1 + by2) / 2) ** 2) ** 0.5
+            limit = config.ADOPT_DISTANCE * max(size, bx2 - bx1, by2 - by1)
+            if distance <= limit and (best_distance is None or distance < best_distance):
+                best, best_distance = number, distance
+        if best is not None:
+            return best
+        number = self._next_number
+        self._next_number += 1
+        return number
 
     def update(
         self, people: list[Person], items: list[PPEItem], frame_shape
@@ -87,8 +126,23 @@ class RulesEngine:
         statuses: list[PersonStatus] = []
         incidents: list[NewIncident] = []
 
+        # Who is on screen with a number already, so nobody takes over their number.
+        present_numbers = {
+            self._number_of[p.id] for p in people if p.id in self._number_of
+        }
+
         for person in people:
-            history = self._histories.setdefault(person.id, _History())
+            self._frames_seen[person.id] = self._frames_seen.get(person.id, 0) + 1
+            if person.id not in self._number_of:
+                if self._frames_seen[person.id] < config.CONFIRM_FRAMES:
+                    continue  # not confirmed yet: ignore (could be a ghost detection)
+                number = self._assign_number(person, present_numbers, now)
+                self._number_of[person.id] = number
+                present_numbers.add(number)
+            number = self._number_of[person.id]
+            self._last_box[number] = person.box
+
+            history = self._histories.setdefault(number, _History())
             history.last_seen = now
             history.helmet.append(
                 any(
@@ -122,9 +176,9 @@ class RulesEngine:
                     history.in_zone = inside_now
                     history.zone_streak = 0
                     if inside_now:
-                        incidents.append(NewIncident(ZONE_ENTRY, person.id))
+                        incidents.append(NewIncident(ZONE_ENTRY, number))
 
-            # PPE: one incident per person per missing item, until it is seen worn again.
+            # PPE: one incident per person per missing item.
             # The person must then be seen wearing it for a sustained time before a new
             # incident is possible, so a wrongly detected "vest" for a moment cannot
             # reset the rule and create a duplicate.
@@ -136,7 +190,7 @@ class RulesEngine:
                     history.worn_streak[item_name] = 0
                     if not history.violating[item_name]:
                         history.violating[item_name] = True
-                        incidents.append(NewIncident(incident_type, person.id))
+                        incidents.append(NewIncident(incident_type, number))
                 else:
                     history.worn_streak[item_name] += 1
                     if history.worn_streak[item_name] >= config.PPE_REARM_FRAMES:
@@ -144,7 +198,7 @@ class RulesEngine:
 
             statuses.append(
                 PersonStatus(
-                    id=person.id,
+                    id=number,
                     box=person.box,
                     has_helmet=has_helmet,
                     has_vest=has_vest,
@@ -153,12 +207,13 @@ class RulesEngine:
             )
 
         # Forget people who have not been seen for a while.
-        for person_id in [
-            pid
-            for pid, h in self._histories.items()
+        for number in [
+            n
+            for n, h in self._histories.items()
             if now - h.last_seen > config.FORGET_AFTER_SECONDS
         ]:
-            del self._histories[person_id]
+            del self._histories[number]
+            self._last_box.pop(number, None)
 
         return statuses, incidents
 

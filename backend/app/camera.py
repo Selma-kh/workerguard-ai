@@ -39,6 +39,7 @@ class Pipeline:
         if self._thread and self._thread.is_alive():
             return
         self.events.clear()
+        self._rules.new_session()  # worker numbers start again at 1
         self._launch()
 
     def stop(self) -> None:
