@@ -26,7 +26,7 @@ Two screens, reached from a collapsible sidebar. No login page, no profile menu,
 **Sidebar:** two items, Dashboard and Event Log. It can be collapsed and expanded with a button.
 
 **Dashboard**
-- Three KPI cards at the top: **Workers** (people detected right now), **Violations** (violations logged this session), **In danger zone** (people inside the red zone right now). The numbers are real counts from the video, never estimates.
+- Three KPI cards **under the video** (she asked for them there): **Workers** (people detected right now), **Violations** (violations logged this session), **In danger zone** (people inside the red zone right now). The numbers are real counts from the video, never estimates.
 - Left: the **video panel** with boxes, IDs, and the red danger zone. The red alert banner sits across the top of this panel. Under it, the **source switch**: Live or Recorded.
 - Right: the **live alert list**.
 - The **mute button** for the siren is on the dashboard.
@@ -37,8 +37,8 @@ Two screens, reached from a collapsible sidebar. No login page, no profile menu,
 - A **Download CSV** button.
 
 ## Look and Feel
-- Professional, simple, and recalling factories, industry and accidents.
-- Base: steel and charcoal greys, clean and plain.
+- Professional and recalling factories, industry and accidents; she found the first light, plain version too simple, so the style is an industrial control room: dark charcoal base, steel panels, monospace numbers, yellow/black hazard-stripe accents, camera-frame corner marks with a "CAM-01" label and timestamp over the video, and LED-style status lights.
+- Base: steel and charcoal greys.
 - Accent: deep blue (from her "Blue Edition" sales deck) for headings, sidebar and buttons.
 - Yellow/orange is an accent used for missing-PPE alerts. Red is reserved for danger-zone entry, the banner and the siren state.
 - A plain, clear sans-serif font; nothing decorative.

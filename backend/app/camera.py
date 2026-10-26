@@ -11,6 +11,7 @@ import cv2
 
 from . import config, renderer
 from .detector import Detector
+from .events import EventStore
 from .rules import PersonStatus, RulesEngine
 
 
@@ -18,6 +19,7 @@ class Pipeline:
     def __init__(self) -> None:
         self._detector: Detector | None = None
         self._rules = RulesEngine()
+        self.events = EventStore()
         self._thread: threading.Thread | None = None
         self._stop = threading.Event()
         self._lock = threading.Lock()
@@ -58,6 +60,7 @@ class Pipeline:
             self._detector = Detector()
         self._detector.reset()
         self._rules.reset()
+        self.events.clear()  # every session starts with an empty log
         try:
             while not self._stop.is_set():
                 ok, frame = capture.read()
@@ -67,9 +70,12 @@ class Pipeline:
                 frame = renderer.resize(frame)
                 people = self._detector.track_people(frame)
                 items = self._detector.find_ppe(frame)
-                statuses = self._rules.update(people, items)
+                statuses, incidents = self._rules.update(people, items, frame.shape)
+                annotated = renderer.draw(frame, statuses)
+                for incident in incidents:
+                    self.events.add(incident.type, incident.person_id)
                 self.statuses = statuses
-                jpeg = renderer.to_jpeg(renderer.draw(frame, statuses))
+                jpeg = renderer.to_jpeg(annotated)
                 with self._lock:
                     self._jpeg = jpeg
                 time.sleep(0.001)  # let other threads breathe

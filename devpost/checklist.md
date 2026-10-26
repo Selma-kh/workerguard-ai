@@ -5,11 +5,11 @@ status: approved
 
 # Build Checklist
 
-Build mode: learn — she asked to review and confirm each slice before it is built, and to try it after it is verified, before moving to the next.
+Build mode: learn at first (she confirmed slice 1 and tried it). After trying slice 1 she asked to build all remaining slices in one go and discuss afterwards, so slices 2-5 are built back to back, each still verified and committed, with her hands-on exploration at the end.
 
 ## Slices
 
-- [ ] **1. You can open the dashboard and see your laptop camera with people boxed and numbered**
+- [x] **1. You can open the dashboard and see your laptop camera with people boxed and numbered**
   Becomes usable: Two programs running locally. Opening `http://localhost:3000` shows the app shell (top bar, sidebar with Dashboard and Event Log) and, after you click Start, the live laptop camera with a box and an ID such as "Worker 1" on each person, stable while they move.
   Why now: It proves the riskiest plumbing end to end first: Python version and library support, camera permission, YOLO with the tracker, and video reaching the browser. Everything else sits on this.
   PRD ref: `prd.md > The Core Journey` (steps 1-4), `prd.md > Screens and Layout`, `prd.md > Detection`
@@ -19,7 +19,7 @@ Build mode: learn — she asked to review and confirm each slice before it is bu
   Learner check: Run the two start commands, open the page, click Start, and stand in front of the camera. You should see yourself boxed with an ID that stays the same as you move.
   Commit: `Add dashboard shell and live tracked camera view`
 
-- [ ] **2. The app tells apart a worker with a helmet and vest from one without**
+- [x] **2. The app tells apart a worker with a helmet and vest from one without**
   Becomes usable: Each tracked person shows whether they have a helmet and a hi-vis vest (yellow/orange marking when one is missing), using a PPE model chosen after testing.
   Why now: The PPE model is the biggest unknown (no published accuracy, unknown dataset licenses). Testing it now gives bad news early, while there is still time to switch models or footage.
   PRD ref: `prd.md > Detection`
@@ -81,3 +81,7 @@ Reflection: not started
 Activity mode: not started
 
 ## Revisions
+
+- Tracker memory and confidence changed (ByteTrack track_buffer 30 to 90, detection confidence 0.4 to 0.1, custom `backend/app/tracker.yaml`) — when she tried slice 1 live, IDs climbed to "Worker 66" after she moved. Simulated detection gaps gave 12 IDs for 4 people with the original settings and 4 with the new ones.
+- PPE weights chosen: harsh-77/ppe-detection — both candidates read helmets and vests well on real worker photos, but harsh-77 ran at about 11 ms/frame on the Mac GPU (33 ms on CPU) against 57 ms (258 ms) for the thalos model, and is 5 MB against 88 MB. Tradeoff: no gloves class. Both files were scanned with picklescan (no dangerous code) before being loaded. Limitation found: bent-over or partly hidden workers are often missed, so demo footage should show workers clearly from the front.
+- The KPI cards go under the video (she asked for this; the PRD sketch had them above), and the dashboard gets a darker factory/control-room style (hazard stripes, camera-frame corners, LED status lights). The PRD is updated to match.

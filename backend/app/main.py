@@ -21,11 +21,15 @@ app.add_middleware(
 @app.get("/api/state")
 def state() -> dict:
     statuses = pipeline.statuses
+    events = pipeline.events.all
     return {
         "status": pipeline.status,
         "workers": len(statuses),
+        "in_zone": sum(1 for s in statuses if s.in_zone),
         "missing_helmet": sum(1 for s in statuses if not s.has_helmet),
         "missing_vest": sum(1 for s in statuses if not s.has_vest),
+        "violations": len(events),
+        "alerts": [e.to_dict() for e in reversed(events)][:50],  # newest first
     }
 
 

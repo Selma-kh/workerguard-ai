@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
-/* Look and feel: steel/charcoal greys, deep blue accent, yellow/orange for missing PPE, red for danger. */
+/* Look and feel: an industrial control room. Dark charcoal and steel panels, deep blue
+   accent, yellow/orange for missing PPE, red only for danger. */
 :root {
-  --background: #eef0f3;
-  --foreground: #1f2933;
+  --background: #12161b;
+  --foreground: #e6eaef;
 }
 
 @theme inline {
@@ -12,14 +13,17 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  --color-brand: #1e3a8a;
-  --color-brand-dark: #172b66;
-  --color-steel: #5b6673;
-  --color-steel-light: #d5d9df;
-  --color-charcoal: #1f2933;
+  --color-panel: #1a2027;
+  --color-panel-2: #212932;
+  --color-line: #2c3640;
+  --color-steel: #8a97a5;
+  --color-steel-light: #c3ccd6;
+  --color-brand: #2f5fd0;
+  --color-brand-dark: #14275e;
+  --color-brand-mid: #1d3a8a;
   --color-warn: #f59e0b;
-  --color-danger: #dc2626;
-  --color-ok: #16a34a;
+  --color-danger: #ef3b3b;
+  --color-ok: #22c55e;
 }
 
 body {
@@ -27,3 +31,32 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
+
+/* Yellow/black hazard stripes, as on factory floors. */
+.hazard-stripe {
+  background: repeating-linear-gradient(
+    135deg,
+    #f59e0b 0 12px,
+    #12161b 12px 24px
+  );
+}
+
+/* Camera-frame corner marks. */
+.frame-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-color: #f59e0b;
+  border-style: solid;
+  pointer-events: none;
+}
+.frame-corner.tl { top: 8px; left: 8px; border-width: 3px 0 0 3px; }
+.frame-corner.tr { top: 8px; right: 8px; border-width: 3px 3px 0 0; }
+.frame-corner.bl { bottom: 8px; left: 8px; border-width: 0 0 3px 3px; }
+.frame-corner.br { bottom: 8px; right: 8px; border-width: 0 3px 3px 0; }
+
+@keyframes alarm-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.alarm-flash { animation: alarm-flash 0.9s ease-in-out infinite; }
