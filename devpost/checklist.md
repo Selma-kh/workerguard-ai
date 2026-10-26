@@ -61,24 +61,24 @@ Build mode: learn at first (she confirmed slice 1 and tried it). After trying sl
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 3 (the siren and zone kernel), because feedback there can still change the log and polish
-- [ ] Final kick-the-tires exploration and feedback completed
+- [x] Early usable behavior explored — after slice 3 (the siren and zone kernel), because feedback there can still change the log and polish
+- [x] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [x] Final review complete — feedback resolved and learner confirms ready to ship
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [x] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: not started
-Route and stops: not started
-Edit outcome: not started
-Reflection: not started
-Activity mode: not started
+Activity and evidence: brief evidence-based recap (focused alternative offered, not done hands-on). The worker-number problem was traced from her live screenshots to two causes, using simulated videos (12 tracker IDs for 4 people before the first fix, 4 after) and a second fix for duplicate boxes; recorded under Revisions above and in the app map's practice to reuse.
+Route and stops: reference route in `devpost/app-map.html`: `backend/app/camera.py` (`Pipeline._run`), `backend/app/rules.py` (`RulesEngine.update`), `frontend/app/page.tsx` (`useSiren`) and `frontend/components/VideoPanel.tsx` (`AlertBanner`). Not toured interactively.
+Edit outcome: offered (change `DANGER_ZONE` in `backend/app/config.py`), not tried; no edit kept.
+Reflection: offered, not answered (she moved on to shipping).
+Activity mode: recap (map shown at `devpost/app-map.html`, opened in her editor)
 
 ## Revisions
 
