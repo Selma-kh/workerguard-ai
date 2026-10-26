@@ -61,6 +61,15 @@ Open <http://localhost:3000> and click **Start**. The first click also lets the 
 
 Put any video (`.mp4`, `.mov`, `.webm`...) in `backend/media/`, then press **Recorded** on the dashboard. The first video in the folder is used and it loops. When a clip loops, the same workers keep their numbers, so a missing vest is not counted again, but a worker who walks into the danger zone on every pass is counted again. Use a freely licensed stock clip or one you film yourself, and keep its license information. Clips are git-ignored by default.
 
+### Free demo clips to try
+
+No video is included in this repository. These two free Pexels clips work well with the app (clear views of workers, with and without PPE). Download them from their Pexels pages and check each clip's license there before reusing them:
+
+- [Workers with safety helmets in warehouse](https://www.pexels.com/video/workers-with-safety-helmets-in-warehouse-10817415/): one worker with a helmet but no vest, one with both who walks into the danger zone.
+- [Men having a conversation while at work](https://www.pexels.com/video/men-having-a-conversation-while-at-work-4293960/): two workers with no helmet and no vest, one of whom enters the danger zone.
+
+Save a clip in `backend/media/`. The Recorded source plays the first file in alphabetical order, so rename a clip (for example `00_demo.mp4`) to make it the one that plays.
+
 ### Move the danger zone
 
 Edit `DANGER_ZONE` in `backend/app/config.py` (left, top, right, bottom as fractions of the frame), then restart the backend.
