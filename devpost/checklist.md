@@ -49,7 +49,7 @@ Build mode: learn at first (she confirmed slice 1 and tried it). After trying sl
   Learner check: Walk in without a helmet, then into the zone; open the Event Log and confirm two rows with photos; download the CSV and open it in a spreadsheet; restart and confirm the log starts empty.
   Commit: `Record incidents with snapshots, summary and CSV export`
 
-- [ ] **5. Switch to a recorded clip, handle a failed camera, and make it ready to share**
+- [x] **5. Switch to a recorded clip, handle a failed camera, and make it ready to share**
   Becomes usable: The Live/Recorded switch works with a freely licensed or self-filmed clip; a failed source shows the black panel with "Camera unavailable, check the connection"; the README, LICENSE (AGPL-3.0) and git ignores are ready for the public repository.
   Why now: The switch is your demo backup, and the failure state and repository hygiene are the last pieces before final review.
   PRD ref: `prd.md > Video source and switch`, `prd.md > States and Boundaries` (camera or video fails), `prd.md > Look and Feel`
@@ -84,4 +84,6 @@ Activity mode: not started
 
 - Tracker memory and confidence changed (ByteTrack track_buffer 30 to 90, detection confidence 0.4 to 0.1, custom `backend/app/tracker.yaml`) — when she tried slice 1 live, IDs climbed to "Worker 66" after she moved. Simulated detection gaps gave 12 IDs for 4 people with the original settings and 4 with the new ones.
 - PPE weights chosen: harsh-77/ppe-detection — both candidates read helmets and vests well on real worker photos, but harsh-77 ran at about 11 ms/frame on the Mac GPU (33 ms on CPU) against 57 ms (258 ms) for the thalos model, and is 5 MB against 88 MB. Tradeoff: no gloves class. Both files were scanned with picklescan (no dangerous code) before being loaded. Limitation found: bent-over or partly hidden workers are often missed, so demo footage should show workers clearly from the front.
+- No stock clip is shipped with the project. Candidate Wikimedia Commons videos were far too large (100 MB to 1.2 GB) and not clear shots of workers, so the Recorded source plays the first video in `backend/media/` (git-ignored) and the dashboard says "No recorded clip found" if the folder is empty. She adds a freely licensed stock clip or films one herself, as her PRD allows.
+- A looping clip restarts the tracker, so its people "re-enter" and the counts climb each loop; documented in the README rather than hidden.
 - The KPI cards go under the video (she asked for this; the PRD sketch had them above), and the dashboard gets a darker factory/control-room style (hazard stripes, camera-frame corners, LED status lights). The PRD is updated to match.
