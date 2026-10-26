@@ -50,6 +50,7 @@ class _History:
     in_zone: bool = False  # confirmed state (after a few frames, so the edge does not flicker)
     zone_streak: int = 0  # consecutive frames that disagree with the confirmed state
     violating: dict = field(default_factory=lambda: {"helmet": False, "vest": False})
+    worn_streak: dict = field(default_factory=lambda: {"helmet": 0, "vest": 0})
     last_seen: float = 0.0
 
 
@@ -124,15 +125,22 @@ class RulesEngine:
                         incidents.append(NewIncident(ZONE_ENTRY, person.id))
 
             # PPE: one incident per person per missing item, until it is seen worn again.
+            # The person must then be seen wearing it for a sustained time before a new
+            # incident is possible, so a wrongly detected "vest" for a moment cannot
+            # reset the rule and create a duplicate.
             for item_name, worn, incident_type in (
                 ("helmet", has_helmet, NO_HELMET),
                 ("vest", has_vest, NO_VEST),
             ):
-                if not worn and not history.violating[item_name]:
-                    history.violating[item_name] = True
-                    incidents.append(NewIncident(incident_type, person.id))
-                elif worn:
-                    history.violating[item_name] = False
+                if not worn:
+                    history.worn_streak[item_name] = 0
+                    if not history.violating[item_name]:
+                        history.violating[item_name] = True
+                        incidents.append(NewIncident(incident_type, person.id))
+                else:
+                    history.worn_streak[item_name] += 1
+                    if history.worn_streak[item_name] >= config.PPE_REARM_FRAMES:
+                        history.violating[item_name] = False
 
             statuses.append(
                 PersonStatus(

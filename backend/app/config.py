@@ -32,6 +32,9 @@ VEST_ZONE = (0.12, 0.80)
 PPE_HISTORY_FRAMES = 15
 PPE_MIN_FRAMES_SEEN = 10  # a person must be seen this long before "missing" is declared
 PPE_SEEN_FRACTION = 0.2  # item counts as worn if seen in at least this share of the frames
+# After a missing-PPE incident, the item must be seen worn for this many frames in a row
+# before the same person can trigger a new incident for it (about 3 seconds).
+PPE_REARM_FRAMES = 60
 
 # The danger zone: a fixed rectangle, as fractions of the frame (left, top, right, bottom).
 # Change these numbers to move the red zone.
@@ -39,7 +42,7 @@ DANGER_ZONE = (0.55, 0.40, 1.0, 1.0)  # reaches the frame edges so nobody "slips
 # A person must be seen inside/outside for this many frames before it counts, so someone
 # standing on the edge does not create a stream of enter/leave events.
 ZONE_ENTER_FRAMES = 3
-ZONE_EXIT_FRAMES = 6
+ZONE_EXIT_FRAMES = 12
 # People not seen for this long are forgotten (a later return counts as new).
 FORGET_AFTER_SECONDS = 8
 
