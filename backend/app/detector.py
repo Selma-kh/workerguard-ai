@@ -1,4 +1,4 @@
-"""Finds people in a frame and gives each one an ID that stays the same over time."""
+"""Finds people (with stable IDs) and PPE items (helmet, vest) in a frame."""
 
 from dataclasses import dataclass
 
@@ -14,18 +14,27 @@ class Person:
     confidence: float
 
 
+@dataclass
+class PPEItem:
+    kind: str  # "helmet" or "vest"
+    box: tuple[int, int, int, int]
+    confidence: float
+
+
 class Detector:
     def __init__(self) -> None:
-        self.model = YOLO(str(config.PERSON_MODEL_PATH))
+        self.person_model = YOLO(str(config.PERSON_MODEL_PATH))
+        self.ppe_model = YOLO(str(config.PPE_MODEL_PATH))
 
-    def track(self, frame) -> list[Person]:
-        """Run detection + tracking on one frame (persist=True keeps IDs between frames)."""
-        results = self.model.track(
+    def track_people(self, frame) -> list[Person]:
+        """Detect people and give each an ID that persists between frames."""
+        results = self.person_model.track(
             frame,
             persist=True,
             classes=[config.PERSON_CLASS_ID],
             tracker=config.TRACKER,
             conf=config.CONFIDENCE,
+            device=config.DEVICE,
             verbose=False,
         )
         boxes = results[0].boxes
@@ -39,9 +48,25 @@ class Detector:
             people.append(Person(int(track_id), (x1, y1, x2, y2), float(conf)))
         return people
 
+    def find_ppe(self, frame) -> list[PPEItem]:
+        """Detect helmets and hi-vis vests anywhere in the frame."""
+        result = self.ppe_model.predict(
+            frame, conf=config.PPE_CONFIDENCE, device=config.DEVICE, verbose=False
+        )[0]
+        items: list[PPEItem] = []
+        for xyxy, cls, conf in zip(
+            result.boxes.xyxy.tolist(), result.boxes.cls.tolist(), result.boxes.conf.tolist()
+        ):
+            kind = config.PPE_CLASS_NAMES.get(self.ppe_model.names[int(cls)])
+            if kind is None:
+                continue  # ignore the model's other classes (human, no-helmet)
+            x1, y1, x2, y2 = (int(v) for v in xyxy)
+            items.append(PPEItem(kind, (x1, y1, x2, y2), float(conf)))
+        return items
+
     def reset(self) -> None:
         """Forget all tracked IDs (used when the source changes or restarts)."""
-        predictor = self.model.predictor
+        predictor = self.person_model.predictor
         if predictor is not None and hasattr(predictor, "trackers"):
             for tracker in predictor.trackers:
                 tracker.reset()

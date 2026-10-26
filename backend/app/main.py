@@ -20,7 +20,13 @@ app.add_middleware(
 
 @app.get("/api/state")
 def state() -> dict:
-    return {"status": pipeline.status, "workers": pipeline.people_count}
+    statuses = pipeline.statuses
+    return {
+        "status": pipeline.status,
+        "workers": len(statuses),
+        "missing_helmet": sum(1 for s in statuses if not s.has_helmet),
+        "missing_vest": sum(1 for s in statuses if not s.has_vest),
+    }
 
 
 @app.post("/api/start")

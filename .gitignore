@@ -10,3 +10,4 @@ __pycache__/
 backend/models/*.pt
 backend/data/snapshots/
 .DS_Store
+backend/models/candidates/
