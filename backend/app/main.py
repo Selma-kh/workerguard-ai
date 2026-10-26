@@ -33,7 +33,8 @@ def state() -> dict:
         "in_zone": sum(1 for s in statuses if s.in_zone),
         "missing_helmet": sum(1 for s in statuses if not s.has_helmet),
         "missing_vest": sum(1 for s in statuses if not s.has_vest),
-        "violations": len(events),
+        "violations": len(events),  # incidents this session
+        "workers_with_violation": pipeline.events.workers_with_violation(),
         "alerts": [e.to_dict() for e in reversed(events)][:50],  # newest first
     }
 

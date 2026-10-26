@@ -55,7 +55,7 @@ export default function EventLog() {
 
       <p className="mb-2 text-xs uppercase tracking-wider text-steel">This session</p>
       <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-5">
-        <Stat label="Violations" value={String(summary?.total ?? 0)} accent="border-t-brand" />
+        <Stat label="Incidents" value={String(summary?.total ?? 0)} accent="border-t-brand" />
         <Stat label="Missing helmet" value={String(summary?.no_helmet ?? 0)} accent="border-t-warn" />
         <Stat label="Missing vest" value={String(summary?.no_vest ?? 0)} accent="border-t-warn" />
         <Stat label="Zone entries" value={String(summary?.zone_entry ?? 0)} accent="border-t-danger" />

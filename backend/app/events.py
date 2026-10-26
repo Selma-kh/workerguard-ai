@@ -98,6 +98,10 @@ class EventStore:
             "compliance_percent": round(100 * compliant / len(seen)) if seen else None,
         }
 
+    def workers_with_violation(self) -> int:
+        """How many different workers have at least one incident this session."""
+        return len({e.person_id for e in self._events})
+
     def to_csv(self) -> str:
         buffer = io.StringIO()
         writer = csv.writer(buffer)

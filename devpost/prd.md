@@ -26,7 +26,7 @@ Two screens, reached from a collapsible sidebar. No login page, no profile menu,
 **Sidebar:** two items, Dashboard and Event Log. It can be collapsed and expanded with a button.
 
 **Dashboard**
-- Three KPI cards **under the video** (she asked for them there): **Workers** (people detected right now), **Violations** (violations logged this session), **In danger zone** (people inside the red zone right now). The numbers are real counts from the video, never estimates.
+- Three KPI cards **under the video** (she asked for them there): **Workers** (people detected right now), **Violations** (how many different workers have at least one incident this session; the Event Log counts every incident), **In danger zone** (people inside the red zone right now). The numbers are real counts from the video, never estimates.
 - Left: the **video panel** with boxes, IDs, and the red danger zone. The red alert banner sits across the top of this panel. Under it, the **source switch**: Live or Recorded.
 - Right: the **live alert list**.
 - The **mute button** for the siren is on the dashboard.

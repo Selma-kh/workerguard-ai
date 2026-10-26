@@ -21,6 +21,7 @@ export type BackendState = {
   missing_helmet: number;
   missing_vest: number;
   violations: number;
+  workers_with_violation: number;
   alerts: Alert[];
 };
 

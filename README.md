@@ -47,6 +47,8 @@ source .venv/bin/activate
 uvicorn app.main:app --port 8000
 ```
 
+The backend does not pick up code changes by itself. After editing anything in `backend/`, stop it (Ctrl+C) and start it again, or start it with `--reload` while developing.
+
 ```bash
 # Terminal 2: the dashboard
 cd frontend
