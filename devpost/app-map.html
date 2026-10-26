@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Worker Safety AI: App Map</title>
+<style>
+  :root { --bg:#12161b; --panel:#1a2027; --line:#2c3640; --text:#e6eaef; --muted:#9aa7b4; --blue:#6f95f0; --warn:#f59e0b; --danger:#ef3b3b; --ok:#22c55e; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .stripe { height:8px; background:repeating-linear-gradient(135deg,#f59e0b 0 12px,#12161b 12px 24px); }
+  main { max-width:900px; margin:0 auto; padding:28px 20px 60px; }
+  h1 { font-size:1.7rem; margin:0 0 4px; } h1 span { color:var(--warn); }
+  h2 { font-size:1.15rem; margin:36px 0 10px; text-transform:uppercase; letter-spacing:.06em; color:var(--blue); }
+  p.lead { color:var(--muted); margin:0 0 8px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:14px 16px; margin:10px 0; }
+  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:.9em; background:#0d1115; padding:1px 5px; border-radius:3px; color:#ffd58a; }
+  pre { background:#0d1115; border:1px solid var(--line); border-radius:6px; padding:12px 14px; overflow-x:auto; font-size:.88rem; }
+  pre code { background:none; padding:0; color:var(--text); }
+  details { background:var(--panel); border:1px solid var(--line); border-radius:6px; margin:10px 0; }
+  summary { cursor:pointer; padding:12px 16px; font-weight:600; }
+  summary:focus-visible, a:focus-visible { outline:3px solid var(--warn); outline-offset:2px; }
+  details > div { padding:0 16px 14px; }
+  ol.route { padding-left:20px; } ol.route li { margin:12px 0; }
+  table { width:100%; border-collapse:collapse; } th,td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; }
+  svg { width:100%; height:auto; display:block; background:#0d1115; border:1px solid var(--line); border-radius:6px; }
+  svg text { fill:var(--text); font:13px system-ui, sans-serif; }
+  svg .small { fill:var(--muted); font-size:11px; }
+  .note { color:var(--muted); font-size:.92rem; }
+</style>
+</head>
+<body>
+<div class="stripe"></div>
+<main>
+  <h1>WORKER SAFETY <span>AI</span>: App Map</h1>
+  <p class="lead">A short guide to where things live, so you can change them with confidence. It is a snapshot of the code, and it can drift as the project changes.</p>
+
+  <h2>What it is</h2>
+  <div class="card">
+    <p>A proof of concept for a safety manager. It watches one camera view, finds workers, flags a missing helmet or hi-vis vest, sounds a siren when someone enters a danger zone, and records every incident in an Event Log with a snapshot. It runs entirely on one laptop and has three main pieces:</p>
+    <ul>
+      <li><strong>Python backend</strong> (<code>backend/app/</code>): reads the camera or a recorded clip, detects people and PPE with YOLO, applies the safety rules, and stores the incidents.</li>
+      <li><strong>Next.js dashboard</strong> (<code>frontend/</code>): shows the video, the banner, the three cards, the alert list and the Event Log, and plays the siren.</li>
+      <li><strong>Local files</strong>: incident snapshots in <code>backend/data/snapshots/</code>, and model weights in <code>backend/models/</code>. There is no database and no cloud.</li>
+    </ul>
+  </div>
+
+  <h2>One action, end to end</h2>
+  <p class="lead">What happens when a worker steps into the red zone.</p>
+  <svg viewBox="0 0 860 250" role="img" aria-label="Diagram: a worker enters the danger zone; camera.py reads the frame; detector.py finds people and PPE; rules.py decides it is a zone entry; events.py stores it; the dashboard shows the banner and plays the siren.">
+    <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#9aa7b4"/></marker></defs>
+    <rect x="10" y="20" width="130" height="64" rx="6" fill="#3a1a1a" stroke="#ef3b3b"/><text x="75" y="48" text-anchor="middle">A worker steps</text><text x="75" y="66" text-anchor="middle">into the red zone</text>
+    <rect x="165" y="20" width="130" height="64" rx="6" fill="#1a2027" stroke="#2c3640"/><text x="230" y="46" text-anchor="middle">camera.py</text><text x="230" y="64" text-anchor="middle" class="small">Pipeline._run</text>
+    <rect x="320" y="20" width="130" height="64" rx="6" fill="#1a2027" stroke="#2c3640"/><text x="385" y="46" text-anchor="middle">detector.py</text><text x="385" y="64" text-anchor="middle" class="small">people + helmet/vest</text>
+    <rect x="475" y="20" width="130" height="64" rx="6" fill="#1a2027" stroke="#2c3640"/><text x="540" y="46" text-anchor="middle">rules.py</text><text x="540" y="64" text-anchor="middle" class="small">RulesEngine.update</text>
+    <rect x="630" y="20" width="130" height="64" rx="6" fill="#1a2027" stroke="#2c3640"/><text x="695" y="46" text-anchor="middle">events.py</text><text x="695" y="64" text-anchor="middle" class="small">EventStore.add</text>
+    <line x1="140" y1="52" x2="162" y2="52" stroke="#9aa7b4" marker-end="url(#arrow)"/>
+    <line x1="295" y1="52" x2="317" y2="52" stroke="#9aa7b4" marker-end="url(#arrow)"/>
+    <line x1="450" y1="52" x2="472" y2="52" stroke="#9aa7b4" marker-end="url(#arrow)"/>
+    <line x1="605" y1="52" x2="627" y2="52" stroke="#9aa7b4" marker-end="url(#arrow)"/>
+    <line x1="695" y1="84" x2="695" y2="130" stroke="#9aa7b4" marker-end="url(#arrow)"/>
+    <rect x="590" y="132" width="240" height="64" rx="6" fill="#1a2027" stroke="#2c3640"/><text x="710" y="158" text-anchor="middle">main.py: /api/state</text><text x="710" y="176" text-anchor="middle" class="small">the dashboard asks twice a second</text>
+    <line x1="590" y1="164" x2="470" y2="164" stroke="#9aa7b4" marker-end="url(#arrow)"/>
+    <rect x="200" y="132" width="270" height="64" rx="6" fill="#1a2027" stroke="#2c3640"/><text x="335" y="158" text-anchor="middle">frontend: VideoPanel + useSiren</text><text x="335" y="176" text-anchor="middle" class="small">red banner, siren, cards, alert list</text>
+    <line x1="200" y1="164" x2="160" y2="164" stroke="#9aa7b4" marker-end="url(#arrow)"/>
+    <rect x="10" y="132" width="150" height="64" rx="6" fill="#3a1a1a" stroke="#ef3b3b"/><text x="85" y="158" text-anchor="middle">You see and hear it</text><text x="85" y="176" text-anchor="middle" class="small">banner + siren</text>
+  </svg>
+
+  <h2>A 3-stop route through the code</h2>
+  <p class="note">This is a reference route. Open each file and search for the name shown.</p>
+  <ol class="route">
+    <li><strong>The loop:</strong> <code>backend/app/camera.py</code>, search <code>def _run</code>. It reads a frame, asks the detector for people and PPE, passes them to the rules, saves any new incident (<code>self.events.add</code>) and sends the drawn frame to the browser.</li>
+    <li><strong>The decision:</strong> <code>backend/app/rules.py</code>, search <code>class RulesEngine</code> then <code>def update</code>. Look for <code>inside_now</code>: a worker's feet position is tested against the zone, and a new incident is created only when someone goes from outside to inside. The same function gives each person a stable worker number and checks helmet and vest.</li>
+    <li><strong>What you see:</strong> <code>frontend/app/page.tsx</code>, search <code>useSiren</code>. The dashboard polls the backend, and the siren plays while the zone has someone in it. The banner is <code>AlertBanner</code> in <code>frontend/components/VideoPanel.tsx</code>.</li>
+  </ol>
+
+  <h2>To change this, start here</h2>
+  <table>
+    <thead><tr><th>I want to change…</th><th>Start here</th></tr></thead>
+    <tbody>
+      <tr><td>Where the danger zone is</td><td><code>backend/app/config.py</code>, <code>DANGER_ZONE</code> (left, top, right, bottom as fractions of the frame). Restart the backend.</td></tr>
+      <tr><td>The wording of an incident</td><td><code>backend/app/events.py</code>, <code>LABELS</code></td></tr>
+      <tr><td>How quickly someone counts as a worker, or is merged with a lost one</td><td><code>backend/app/config.py</code>, <code>CONFIRM_FRAMES</code>, <code>ADOPT_SECONDS</code></td></tr>
+      <tr><td>How long before a missing helmet or vest can be flagged again</td><td><code>backend/app/config.py</code>, <code>PPE_REARM_FRAMES</code></td></tr>
+      <tr><td>The PPE model</td><td><code>backend/download_weights.py</code> and <code>PPE_MODEL_PATH</code> in <code>config.py</code></td></tr>
+      <tr><td>Colors and the control-room look</td><td><code>frontend/app/globals.css</code> (the <code>@theme</code> block)</td></tr>
+      <tr><td>The siren sound</td><td><code>frontend/public/siren.wav</code></td></tr>
+      <tr><td>What the cards count</td><td><code>frontend/components/KpiCards.tsx</code> and <code>state()</code> in <code>backend/app/main.py</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>A practice to reuse</h2>
+  <div class="card">
+    <p><strong>Reproduce a flaky behavior with a small simulation, and track one number before and after the fix.</strong></p>
+    <p>In this project the worker numbers kept climbing for a single person. A simulated video with detection gaps gave <strong>12 tracker IDs for 4 people</strong> with the original settings and <strong>4</strong> after the fix. A later live test showed the same symptom from a different cause (duplicate boxes on a close-up face), so a second rule was added and tested the same way. The record is in <code>devpost/checklist.md</code> under <strong>Revisions</strong>.</p>
+    <p>On another project: when something behaves oddly, write down what you expected, build the smallest repeatable test that shows the problem, and pick one number to watch. It tells you whether a fix worked and whether a new symptom is the same problem or a different one.</p>
+  </div>
+
+  <h2>Run it again</h2>
+<pre><code># Terminal 1 (backend)
+cd backend
+source .venv/bin/activate
+uvicorn app.main:app --port 8000
+
+# Terminal 2 (dashboard)
+cd frontend
+npm run dev
+# open http://localhost:3000, then click Start</code></pre>
+  <p class="note">First time? See the setup steps in <code>README.md</code> (install the requirements, run <code>python download_weights.py</code>, and run <code>npm install</code>). Recorded plays the first video in <code>backend/media/</code>. The backend does not reload by itself, so restart it after changing code.</p>
+  <p class="note">Snapshot of the code at submission. File names and symbols may drift as the code changes.</p>
+</main>
+</body>
+</html>
