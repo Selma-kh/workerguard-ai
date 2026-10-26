@@ -9,6 +9,7 @@ while running restarts the loop on the new source but keeps the session's log.
 The newest JPEG frame is kept in memory so /video can stream it to the browser.
 """
 
+import json
 import threading
 import time
 
@@ -111,6 +112,20 @@ class Pipeline:
                     return
                 frame = renderer.resize(frame)
                 people = self._detector.track_people(frame)
+                if config.DEBUG_LOG is not None:
+                    with open(config.DEBUG_LOG, "a") as log:
+                        log.write(
+                            json.dumps(
+                                {
+                                    "t": round(time.time(), 2),
+                                    "people": [
+                                        [p.id, list(p.box), round(p.confidence, 2)]
+                                        for p in people
+                                    ],
+                                }
+                            )
+                            + "\n"
+                        )
                 items = self._detector.find_ppe(frame)
                 statuses, incidents = self._rules.update(people, items, frame.shape)
                 annotated = renderer.draw(frame, statuses)

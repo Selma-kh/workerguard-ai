@@ -47,8 +47,10 @@ ZONE_EXIT_FRAMES = 12
 CONFIRM_FRAMES = 5
 # A newly confirmed person who appears near someone lost less than this long ago (and within
 # ADOPT_DISTANCE box sizes of where they were) is treated as the same person.
-ADOPT_SECONDS = 2.0
-ADOPT_DISTANCE = 1.0
+ADOPT_SECONDS = 4.0
+ADOPT_DISTANCE = 2.0
+# Two boxes where the smaller is this much inside the other are the same person.
+DUPLICATE_OVERLAP = 0.7
 # People not seen for this long are forgotten (a later return counts as new).
 FORGET_AFTER_SECONDS = 8
 
@@ -71,6 +73,10 @@ def find_clip() -> Path | None:
 
 # Where snapshots of incidents are saved (emptied at the start of every session).
 SNAPSHOT_DIR = BASE_DIR / "data" / "snapshots"
+
+# Set WG_DEBUG=1 to write the tracker's raw numbers (IDs, boxes, confidence; no images)
+# to backend/data/debug.log, to investigate tracking problems.
+DEBUG_LOG = BASE_DIR / "data" / "debug.log" if os.environ.get("WG_DEBUG") else None
 
 # Video sent to the browser
 STREAM_WIDTH = 960

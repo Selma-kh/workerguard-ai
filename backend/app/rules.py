@@ -72,6 +72,15 @@ def _item_belongs_to(person_box, item_box, vertical_zone: tuple[float, float]) -
     return px1 <= cx <= px2 and top <= cy <= bottom
 
 
+def _overlap_with_smaller(a, b) -> float:
+    """Share of the smaller box that lies inside the other box (1.0 = fully inside)."""
+    ix1, iy1 = max(a[0], b[0]), max(a[1], b[1])
+    ix2, iy2 = min(a[2], b[2]), min(a[3], b[3])
+    inter = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+    smaller = min((a[2] - a[0]) * (a[3] - a[1]), (b[2] - b[0]) * (b[3] - b[1]))
+    return inter / smaller if smaller > 0 else 0.0
+
+
 def zone_pixels(frame_shape) -> tuple[int, int, int, int]:
     """The danger zone rectangle in pixels for a frame of the given (height, width, ...)."""
     height, width = frame_shape[:2]
@@ -118,6 +127,25 @@ class RulesEngine:
         self._next_number += 1
         return number
 
+    def _without_duplicates(self, people: list[Person]) -> list[Person]:
+        """Drop a box that mostly lies inside another person's box: it is the same person
+        detected twice (for example the face and the upper body)."""
+        kept: list[Person] = []
+        # Prefer people who already have a number, then the most confident box.
+        ordered = sorted(
+            people,
+            key=lambda p: (p.id in self._number_of, p.confidence),
+            reverse=True,
+        )
+        for person in ordered:
+            if any(
+                _overlap_with_smaller(person.box, other.box) >= config.DUPLICATE_OVERLAP
+                for other in kept
+            ):
+                continue
+            kept.append(person)
+        return kept
+
     def update(
         self, people: list[Person], items: list[PPEItem], frame_shape
     ) -> tuple[list[PersonStatus], list[NewIncident]]:
@@ -130,6 +158,8 @@ class RulesEngine:
         present_numbers = {
             self._number_of[p.id] for p in people if p.id in self._number_of
         }
+
+        people = self._without_duplicates(people)
 
         for person in people:
             self._frames_seen[person.id] = self._frames_seen.get(person.id, 0) + 1
