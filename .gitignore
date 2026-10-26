@@ -15,3 +15,9 @@ backend/models/candidates/
 # Recorded clips and generated snapshots stay local (add a clip yourself, see README)
 backend/media/*
 !backend/media/.gitkeep
+
+# Course material (not part of this project)
+.claude/
+.agents/
+agent/
+skills-lock.json
