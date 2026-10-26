@@ -48,6 +48,9 @@ FORGET_AFTER_SECONDS = 8
 _env_source = os.environ.get("WG_SOURCE")
 CAMERA_SOURCE: int | str = _env_source if _env_source else 0
 
+# Where snapshots of incidents are saved (emptied at the start of every session).
+SNAPSHOT_DIR = BASE_DIR / "data" / "snapshots"
+
 # Video sent to the browser
 STREAM_WIDTH = 960
 JPEG_QUALITY = 80

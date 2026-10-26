@@ -4,7 +4,8 @@ import time
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 
 from . import config
 from .camera import pipeline
@@ -31,6 +32,23 @@ def state() -> dict:
         "violations": len(events),
         "alerts": [e.to_dict() for e in reversed(events)][:50],  # newest first
     }
+
+
+@app.get("/api/events")
+def events() -> dict:
+    return {
+        "summary": pipeline.events.summary(),
+        "events": [e.to_dict() for e in reversed(pipeline.events.all)],  # newest first
+    }
+
+
+@app.get("/api/export.csv")
+def export_csv() -> Response:
+    return Response(
+        pipeline.events.to_csv(),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="incident-log.csv"'},
+    )
 
 
 @app.post("/api/start")
@@ -66,3 +84,8 @@ def video() -> StreamingResponse:
     return StreamingResponse(
         _mjpeg(), media_type="multipart/x-mixed-replace; boundary=frame"
     )
+
+
+# Snapshot images of incidents, shown in the Event Log.
+config.SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/snapshots", StaticFiles(directory=str(config.SNAPSHOT_DIR)), name="snapshots")

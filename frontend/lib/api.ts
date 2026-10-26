@@ -22,6 +22,23 @@ export type BackendState = {
   alerts: Alert[];
 };
 
+export type Summary = {
+  total: number;
+  no_helmet: number;
+  no_vest: number;
+  zone_entry: number;
+  workers_seen: number;
+  compliance_percent: number | null;
+};
+
+export type EventLogData = { summary: Summary; events: Alert[] };
+
+export async function getEvents(): Promise<EventLogData> {
+  const response = await fetch(`${BACKEND_URL}/api/events`, { cache: "no-store" });
+  if (!response.ok) throw new Error("Backend returned an error");
+  return response.json();
+}
+
 export async function getState(): Promise<BackendState> {
   const response = await fetch(`${BACKEND_URL}/api/state`, { cache: "no-store" });
   if (!response.ok) throw new Error("Backend returned an error");

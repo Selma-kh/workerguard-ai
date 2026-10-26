@@ -29,7 +29,7 @@ Build mode: learn at first (she confirmed slice 1 and tried it). After trying sl
   Learner check: Put on a helmet or a hi-vis item (or hold a picture of one) and take it off; the marking on your box should change.
   Commit: `Detect helmet and hi-vis vest per tracked person`
 
-- [ ] **3. A red danger zone, a siren, and live counts when someone steps into it**
+- [x] **3. A red danger zone, a siren, and live counts when someone steps into it**
   Becomes usable: A fixed red zone is drawn on the video. When a person steps in, the red banner appears over the video, the siren plays until the zone is empty (mute button works), and the cards Workers, Violations and In danger zone show real counts.
   Why now: This is the kernel from your scope: detection turning into action. It comes before the log and the polish so the idea is visible as early as possible.
   PRD ref: `prd.md > Danger zone`, `prd.md > Alerts and siren`, `prd.md > Counting rules (IDs, two people, re-entry)`, `prd.md > States and Boundaries` (empty)

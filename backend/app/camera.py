@@ -72,8 +72,10 @@ class Pipeline:
                 items = self._detector.find_ppe(frame)
                 statuses, incidents = self._rules.update(people, items, frame.shape)
                 annotated = renderer.draw(frame, statuses)
+                self.events.note_people(s.id for s in statuses)
                 for incident in incidents:
-                    self.events.add(incident.type, incident.person_id)
+                    # the snapshot is the annotated frame at the moment of the incident
+                    self.events.add(incident.type, incident.person_id, annotated)
                 self.statuses = statuses
                 jpeg = renderer.to_jpeg(annotated)
                 with self._lock:
