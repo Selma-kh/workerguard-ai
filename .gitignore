@@ -11,3 +11,7 @@ backend/models/*.pt
 backend/data/snapshots/
 .DS_Store
 backend/models/candidates/
+
+# Recorded clips and generated snapshots stay local (add a clip yourself, see README)
+backend/media/*
+!backend/media/.gitkeep

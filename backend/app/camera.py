@@ -1,7 +1,12 @@
 """Runs the camera -> detector -> rules -> renderer loop in a background thread.
 
-The loop starts when the dashboard presses Start and stops on Stop. The newest
-JPEG frame is kept in memory so /video can stream it to the browser.
+Two sources, one at a time:
+- "live": the laptop camera;
+- "recorded": the first video found in backend/media/ (it loops).
+
+The loop starts when the dashboard presses Start and stops on Stop. Switching source
+while running restarts the loop on the new source but keeps the session's log.
+The newest JPEG frame is kept in memory so /video can stream it to the browser.
 """
 
 import threading
@@ -24,46 +29,82 @@ class Pipeline:
         self._stop = threading.Event()
         self._lock = threading.Lock()
         self._jpeg: bytes | None = None
+        self.source = "live"  # live | recorded
         self.status = "stopped"  # stopped | running | unavailable
         self.statuses: list[PersonStatus] = []
 
     # --- control -----------------------------------------------------------
     def start(self) -> None:
+        """Start a new session: the log begins empty."""
         if self._thread and self._thread.is_alive():
             return
-        self._stop.clear()
-        self.status = "running"
-        self._thread = threading.Thread(target=self._run, daemon=True)
-        self._thread.start()
+        self.events.clear()
+        self._launch()
 
     def stop(self) -> None:
-        self._stop.set()
-        if self._thread:
-            self._thread.join(timeout=3)
-        self._thread = None
+        self._halt()
         self.status = "stopped"
         self.statuses = []
         with self._lock:
             self._jpeg = None
 
+    def set_source(self, source: str) -> None:
+        """Choose live or recorded. If running, continue the same session on the new source."""
+        if source not in ("live", "recorded"):
+            raise ValueError("source must be 'live' or 'recorded'")
+        was_running = self._thread is not None and self._thread.is_alive()
+        self.source = source
+        if was_running:
+            self._halt()
+            self._launch()
+        elif self.status == "unavailable":
+            self.status = "stopped"  # clear an old failure message; Start will retry
+
     def latest_jpeg(self) -> bytes | None:
         with self._lock:
             return self._jpeg
 
-    # --- worker thread -----------------------------------------------------
-    def _run(self) -> None:
-        capture = cv2.VideoCapture(config.CAMERA_SOURCE)
-        if not capture.isOpened():
+    # --- internals ---------------------------------------------------------
+    def _launch(self) -> None:
+        self._stop.clear()
+        self.status = "running"
+        self._thread = threading.Thread(target=self._run, args=(self.source,), daemon=True)
+        self._thread.start()
+
+    def _halt(self) -> None:
+        self._stop.set()
+        if self._thread:
+            self._thread.join(timeout=5)
+        self._thread = None
+
+    def _open(self, source: str):
+        if source == "recorded":
+            clip = config.find_clip()
+            return cv2.VideoCapture(str(clip)) if clip else None
+        return cv2.VideoCapture(config.CAMERA_SOURCE)
+
+    def _run(self, source: str) -> None:
+        capture = self._open(source)
+        if capture is None or not capture.isOpened():
             self.status = "unavailable"
             return
         if self._detector is None:
             self._detector = Detector()
         self._detector.reset()
         self._rules.reset()
-        self.events.clear()  # every session starts with an empty log
+        is_file = source == "recorded" or isinstance(config.CAMERA_SOURCE, str)
+        frame_time = 1 / (capture.get(cv2.CAP_PROP_FPS) or 25) if is_file else 0
         try:
             while not self._stop.is_set():
+                started = time.time()
                 ok, frame = capture.read()
+                if not ok and is_file and not self._stop.is_set():
+                    # end of the clip: start it again, with fresh IDs
+                    if source == "recorded":
+                        capture.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                        self._detector.reset()
+                        self._rules.reset()
+                        ok, frame = capture.read()
                 if not ok:
                     self.status = "unavailable"
                     return
@@ -80,7 +121,10 @@ class Pipeline:
                 jpeg = renderer.to_jpeg(annotated)
                 with self._lock:
                     self._jpeg = jpeg
-                time.sleep(0.001)  # let other threads breathe
+                if is_file:  # play files at their own speed, not as fast as possible
+                    time.sleep(max(0.0, frame_time - (time.time() - started)))
+                else:
+                    time.sleep(0.001)
         finally:
             capture.release()
 

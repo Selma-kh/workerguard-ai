@@ -48,6 +48,18 @@ FORGET_AFTER_SECONDS = 8
 _env_source = os.environ.get("WG_SOURCE")
 CAMERA_SOURCE: int | str = _env_source if _env_source else 0
 
+# The "Recorded" source plays the first video found in this folder (stock or self-filmed).
+MEDIA_DIR = BASE_DIR / "media"
+VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v", ".webm", ".avi"}
+
+
+def find_clip() -> Path | None:
+    if not MEDIA_DIR.exists():
+        return None
+    clips = sorted(p for p in MEDIA_DIR.iterdir() if p.suffix.lower() in VIDEO_EXTENSIONS)
+    return clips[0] if clips else None
+
+
 # Where snapshots of incidents are saved (emptied at the start of every session).
 SNAPSHOT_DIR = BASE_DIR / "data" / "snapshots"
 

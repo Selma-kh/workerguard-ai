@@ -14,6 +14,8 @@ export type Alert = {
 
 export type BackendState = {
   status: "stopped" | "running" | "unavailable";
+  source: "live" | "recorded";
+  clip_available: boolean;
   workers: number;
   in_zone: number;
   missing_helmet: number;
@@ -53,4 +55,13 @@ export async function startCamera(): Promise<void> {
 export async function stopCamera(): Promise<void> {
   const response = await fetch(`${BACKEND_URL}/api/stop`, { method: "POST" });
   if (!response.ok) throw new Error("Could not stop the camera");
+}
+
+export async function chooseSource(source: "live" | "recorded"): Promise<void> {
+  const response = await fetch(`${BACKEND_URL}/api/source`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ source }),
+  });
+  if (!response.ok) throw new Error("Could not change the source");
 }

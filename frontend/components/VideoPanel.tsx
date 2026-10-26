@@ -47,6 +47,8 @@ export default function VideoPanel({ streamKey }: { streamKey: number }) {
   let message = "Press Start to begin";
   if (state === null || state.status === "unavailable")
     message = "Camera unavailable, check the connection";
+  if (state && state.source === "recorded" && !state.clip_available)
+    message = "No recorded clip found. Add a video to backend/media/";
 
   return (
     <div className="relative aspect-video w-full overflow-hidden rounded border border-line bg-black">

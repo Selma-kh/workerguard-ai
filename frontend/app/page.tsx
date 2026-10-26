@@ -5,7 +5,7 @@ import AlertList from "@/components/AlertList";
 import { useBackend } from "@/components/BackendProvider";
 import KpiCards from "@/components/KpiCards";
 import VideoPanel from "@/components/VideoPanel";
-import { startCamera, stopCamera } from "@/lib/api";
+import { chooseSource, startCamera, stopCamera } from "@/lib/api";
 import { useSiren } from "@/lib/useSiren";
 
 export default function Dashboard() {
@@ -25,6 +25,17 @@ export default function Dashboard() {
       }
     } catch {
       // the status light and video panel already show when the backend is down
+    }
+    refresh();
+  }
+
+  async function pickSource(source: "live" | "recorded") {
+    if (state?.source === source) return;
+    try {
+      await chooseSource(source);
+      setStreamKey((k) => k + 1); // the video restarts on the new source
+    } catch {
+      // the status light already shows when the backend is down
     }
     refresh();
   }
@@ -59,6 +70,25 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_20rem]">
         <div className="space-y-4">
           <VideoPanel streamKey={streamKey} />
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-semibold uppercase tracking-wider text-steel">
+              Source
+            </span>
+            {(["live", "recorded"] as const).map((source) => (
+              <button
+                key={source}
+                onClick={() => pickSource(source)}
+                disabled={state === null}
+                className={`rounded border px-4 py-1.5 text-sm font-semibold capitalize ${
+                  state?.source === source
+                    ? "border-brand bg-brand text-white"
+                    : "border-line bg-panel-2 text-steel-light hover:bg-panel"
+                }`}
+              >
+                {source}
+              </button>
+            ))}
+          </div>
           <KpiCards />
         </div>
         <AlertList />

@@ -1,11 +1,13 @@
 """The backend's web server: serves the video stream and the dashboard's data."""
 
 import time
+from typing import Literal
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
 from . import config
 from .camera import pipeline
@@ -25,6 +27,8 @@ def state() -> dict:
     events = pipeline.events.all
     return {
         "status": pipeline.status,
+        "source": pipeline.source,
+        "clip_available": config.find_clip() is not None,
         "workers": len(statuses),
         "in_zone": sum(1 for s in statuses if s.in_zone),
         "missing_helmet": sum(1 for s in statuses if not s.has_helmet),
@@ -55,6 +59,16 @@ def export_csv() -> Response:
 def start() -> dict:
     pipeline.start()
     return {"status": pipeline.status}
+
+
+class SourceChoice(BaseModel):
+    source: Literal["live", "recorded"]
+
+
+@app.post("/api/source")
+def set_source(choice: SourceChoice) -> dict:
+    pipeline.set_source(choice.source)
+    return {"status": pipeline.status, "source": pipeline.source}
 
 
 @app.post("/api/stop")

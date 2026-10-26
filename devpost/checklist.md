@@ -39,7 +39,7 @@ Build mode: learn at first (she confirmed slice 1 and tried it). After trying sl
   Learner check: Click Start, walk into the red zone: you should hear the siren and see the banner and the card change; step out and it should stop; press mute and the sound should stop while the banner stays.
   Commit: `Add danger zone, banner, siren and live counts`
 
-- [ ] **4. Every incident is recorded with a snapshot, in an Event Log you can export**
+- [x] **4. Every incident is recorded with a snapshot, in an Event Log you can export**
   Becomes usable: Each missing-PPE alert (one per person per missing item) and each zone entry appears in the live alert list and in the Event Log page with a time, type and snapshot thumbnail; the session summary shows totals by type and a compliance figure; Download CSV works.
   Why now: It completes the kernel (the incident is recorded, not just heard) and builds on the rules from slice 3.
   PRD ref: `prd.md > Alerts and siren`, `prd.md > Counting rules (IDs, two people, re-entry)`, `prd.md > Event Log and CSV export`, `prd.md > States and Boundaries` (persistence)
