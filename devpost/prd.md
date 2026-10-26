@@ -161,5 +161,5 @@ One fixed red zone is drawn over the video. Its position is set in advance and c
 
 ## Open Questions
 - Banner position: the bar over the top of the video panel is built (red for the zone, orange for missing PPE). She can still change it.
-- Whether missing-PPE alerts should stay in the live list and banner (option A, built) or only appear in the Event Log (option B): not answered yet.
+- Missing-PPE alerts appear in the live list, the banner and the Event Log (option A). She confirmed keeping them all. Resolved.
 - Snapshots may show faces (face blur is deferred); she agreed. The public repo must not include snapshot files of real people (use stock or self-filmed footage only).

@@ -199,5 +199,5 @@ No external services, accounts, API keys, hosting or cost.
 - Accuracy of helmet and vest detection on her own live camera and footage: tested on stock photos and videos only. Works best on clear, front or back views; bent-over, half-hidden or dark-helmet-from-behind cases are missed.
 - The PPE model's training dataset and its license are unknown.
 - Snapshot files and recorded clips must stay out of the public repository (they are git-ignored).
-- Whether PPE alerts stay visible in the live list and banner (option A, current) or only in the log (option B): she has not answered; A is built.
+- Resolved: missing-PPE alerts stay in the live list, the banner and the Event Log (option A); she confirmed keeping them all.
 - The DJI Osmo as a live camera is deferred.
