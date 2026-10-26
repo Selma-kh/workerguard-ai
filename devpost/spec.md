@@ -56,6 +56,7 @@ PRD ref: `prd.md > The Core Journey`.
   - Frontend: from `frontend/`, run `npm install` then `npm run dev`.
 - Open `http://localhost:3000`, click Start, choose Live or Recorded. Recorded plays the first video in `backend/media/` (git-ignored; add a stock or self-filmed clip).
 - Demo recording: record the screen while a person walks in without a helmet or vest, then into the red zone, then open the Event Log and download the CSV.
+- Public GitHub repository: https://github.com/Selma-kh/workerguard-ai (checked without logging in: public, AGPL-3.0, 18 commits, no private files).
 - Submission needs a short demo video and a public GitHub repository. Deployment is optional and not planned. A README with these start steps goes in the repository.
 
 ## Look and Feel
