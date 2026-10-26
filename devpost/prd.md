@@ -13,7 +13,7 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`, `scope.md > 
 2. They see the top bar, a sidebar with **Dashboard** and **Event Log**, three KPI cards, the video area, the source switch, and the live alert list.
 3. They choose the video source with the switch: **Live** (the laptop webcam) or **Recorded** (a freely licensed stock clip, not YouTube, or a clip they filmed).
 4. The video plays with a box around each detected person, a short ID (for example "Worker 1"), and a fixed red danger zone drawn over the floor.
-5. When a worker is missing a helmet or a hi-vis vest, or enters the danger zone, the alert happens: a siren sounds, a red banner appears over the video, the alert is added to the live list, and the KPI cards update.
+5. When a worker is missing a helmet or a hi-vis vest, or enters the danger zone, the alert happens: a red (zone) or orange (missing PPE) banner appears over the video, the alert is added to the live list, and the KPI cards update. The siren sounds for danger-zone entry only.
 6. When the situation is resolved (the worker puts the PPE on, or leaves the zone), the siren stops and the banner disappears.
 7. The manager opens the **Event Log** to see every incident with a snapshot, a summary of totals by type, and can download the log as a CSV.
 8. Success: in a one-minute demo, a worker is detected, triggers an alert, the siren sounds, and the incident appears in the log.
@@ -48,7 +48,7 @@ Two screens, reached from a collapsible sidebar. No login page, no profile menu,
 ## Features and Behavior
 
 ### Video source and switch
-One camera view is shown at a time. The switch chooses its source: Live or Recorded. Recorded is a freely licensed stock clip (not YouTube) or a clip the learner films.
+One camera view is shown at a time. The switch chooses its source: Live or Recorded. Recorded plays the first video found in `backend/media/` (a freely licensed stock clip, not YouTube, or a clip the learner films) and loops it; the same workers keep their numbers when it restarts.
 - As a safety manager, I want to choose between a live camera and a recorded clip so that I can demo reliably.
   - [ ] Pressing Live shows the laptop webcam feed; pressing Recorded plays the clip.
   - [ ] Only one source is shown and analysed at a time.
@@ -68,7 +68,7 @@ One fixed red zone is drawn over the video. Its position is set in advance and c
   - [ ] Someone outside the zone is not counted.
 
 ### Alerts and siren
-- When there is a missing-PPE violation or someone in the zone, a red banner appears across the top of the video panel saying what happened (for example "Danger zone: 1 worker inside"), and the alert is added to the live list.
+- When someone is in the zone, a **red** banner appears across the top of the video panel (for example "Danger zone: 1 worker inside"). When someone is missing a helmet or vest, an **orange** banner appears (for example "PPE missing: 1 without a helmet, 1 without a vest"). The alert is added to the live list in both cases.
 - The siren plays while anyone is in the danger zone and stops when the zone is empty. A mute button silences it.
 - The live alert list shows the time and what the violation was. Missing-PPE alerts use the yellow/orange accent; danger-zone alerts use red.
 - As a safety manager, I want an audible and visible alert so that the danger is noticed immediately.
@@ -78,8 +78,11 @@ One fixed red zone is drawn over the video. Its position is set in advance and c
   - [ ] Each alert appears in the list with a time and a violation type.
 
 ### Counting rules (IDs, two people, re-entry)
-- Each person has an ID. A new zone violation is logged only when an ID **enters** the zone (outside to inside).
-- If the same ID leaves the zone and enters again later, it is logged again.
+- Each person has a worker number ("Worker 1", "Worker 2"...) that starts at 1 in each session. A person only counts after being seen for a few frames, so brief ghost detections are ignored.
+- If the system detects the same person twice (for example the face and the upper body), or gives them a new internal ID after a short loss near the same spot, they remain one worker with one number.
+- A new zone violation is logged only when a worker **enters** the zone (outside to inside).
+- If the same worker leaves the zone and enters again later, it is logged again.
+- A missing helmet or vest is logged once per worker per item. It can be logged again only after the worker was seen wearing it for about three seconds in a row and then loses it.
 - If the same ID stays in the zone but the system briefly loses and re-detects them, no new violation is logged.
 - If two people are in the zone, one siren plays while anyone is inside and each person gets their own log entry. A person who stays inside does not create a new entry on every frame.
 - As a safety manager, I want an honest log so that the report can be trusted.
@@ -89,7 +92,7 @@ One fixed red zone is drawn over the video. Its position is set in advance and c
 
 ### Event Log and CSV export
 - Every incident is saved with a time, a type, and a snapshot image, and is shown in the Event Log table.
-- A summary at the top counts violations by type and shows a compliance figure. It covers the current session only (she cancelled "everything saved"). A monthly average or trend over time belongs to the full product.
+- A summary at the top counts incidents by type and shows a compliance figure. It covers the current session only (she cancelled "everything saved"). A monthly average or trend over time belongs to the full product.
 - A Download CSV button exports the log (the CSV contains the text columns and the snapshot file names; the images are separate files).
 - As a safety manager, I want to review and export incidents so that I can report them to management.
   - [ ] Each alert creates one row with a time, type, and snapshot.
@@ -157,5 +160,6 @@ One fixed red zone is drawn over the video. Its position is set in advance and c
 - No claim that "nobody does this": the research found competitors with PPE detection and siren hardware.
 
 ## Open Questions
-- Banner position: the red bar over the top of the video panel is the working choice; she asked for references and said "for the rest" to keep the suggestions. She can still change it. Does not block `4-spec`.
+- Banner position: the bar over the top of the video panel is built (red for the zone, orange for missing PPE). She can still change it.
+- Whether missing-PPE alerts should stay in the live list and banner (option A, built) or only appear in the Event Log (option B): not answered yet.
 - Snapshots may show faces (face blur is deferred); she agreed. The public repo must not include snapshot files of real people (use stock or self-filmed footage only).
