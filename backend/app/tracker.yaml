@@ -1,0 +1,11 @@
+# ByteTrack settings for Worker Safety AI.
+# Based on the Ultralytics defaults, with a longer memory (track_buffer) so a person
+# who is briefly lost (turned away, cut by the edge of the image, hidden) keeps the
+# same ID instead of getting a new one.
+tracker_type: bytetrack
+track_high_thresh: 0.25 # confident detections that start or continue a track
+track_low_thresh: 0.1 # weaker detections can still continue an existing track
+new_track_thresh: 0.25 # a new track needs a confident detection (avoids false tracks)
+track_buffer: 90 # frames a lost person is remembered (default was 30)
+match_thresh: 0.8
+fuse_score: True
